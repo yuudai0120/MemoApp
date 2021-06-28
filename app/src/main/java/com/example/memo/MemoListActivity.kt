@@ -2,33 +2,28 @@ package com.example.memo
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 
 class MemoListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.memo_list)
-        this.actionBar?.title = "メモ一覧"
+        this.actionBar?.title = "メモ一覧だよ"
         setRecyclerView()
-        // 永続データベースを作成
-        val db = Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name").build()
-
-//        val memo = Memo()
-//        memo.id = Random().nextInt()
-//        memo.title = "タイトル"
-//        memo.body = "内容"
-//
-//        thread {
-//            db.memoDao().insert(memo)
-//        }
+        getMemoData()
 
 
     }
@@ -57,7 +52,6 @@ class MemoListActivity : AppCompatActivity() {
     }
 
     fun setRecyclerView() {
-        var page = 1
         var mainAdapter: MemoAdapter? = null
 
         val recyclerView = findViewById<RecyclerView>(R.id.main_recycler_view)
@@ -68,32 +62,34 @@ class MemoListActivity : AppCompatActivity() {
         // このlayoutManagerの種類によって「1列のリスト」なのか「２列のリスト」とかが選べる。
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this)
         recyclerView.layoutManager = layoutManager
+        val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        recyclerView.addItemDecoration(itemDecoration)
         // Adapter生成してRecyclerViewにセット
-        mainAdapter = MemoAdapter(createRowData(page))
-        recyclerView.adapter = mainAdapter
+//        mainAdapter = MemoAdapter(createRowData(page))
 
-        mainAdapter.setOnItemClickListener(View.OnClickListener {
-            val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
-            intent.putExtra("memo",mainAdapter.toString())
-            startActivity(intent)
-        })
-    }
+        val database =
+            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
+                .build()
 
-
-    /**
-     * 20行追加する
-     */
-    private fun createRowData(page: Int): List<RowData> {
-        val dataSet: MutableList<RowData> = ArrayList()
-        var i = 1
-        while (i < page * 20) {
-            val data = RowData()
-            data.memoTitle = "Title" + Integer.toString(i)
-            dataSet.add(data)
-            i += 1
+        // データを保存
+        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
+            val dataSet: MutableList<RowData> = ArrayList()
+            val memoList = database.memoDao().getAllMemo()
+            for (memo in memoList) {
+                val data = RowData()
+                data.memoTitle = memo.title
+                dataSet.add(data)
+            }
+            GlobalScope.launch(Dispatchers.Main) {  // main thread
+                mainAdapter = MemoAdapter(dataSet)
+                recyclerView.adapter = mainAdapter
+                mainAdapter!!.setOnItemClickListener(View.OnClickListener {
+                    val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
+                    intent.putExtra("memo",memoList[0].title)
+                    startActivity(intent)
+                })
+            }
         }
-        
-        return dataSet
     }
 
     /**
@@ -101,5 +97,39 @@ class MemoListActivity : AppCompatActivity() {
      */
     inner class RowData {
         var memoTitle: String? = null
+    }
+
+    private fun getMemoData() {
+//        val database =
+//            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
+//                .build()
+//        // データを保存
+//        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
+//            val data = database.memoDao().getAllMemo()
+//            Log.v("TAG", "after insert ${database.memoDao().getAllMemo()}")
+//            GlobalScope.launch(Dispatchers.Main) {  // main thread
+//                Toast.makeText(applicationContext, "メモ取得しました", Toast.LENGTH_SHORT).show()
+//            }
+//            Log.v("TAG", "data: ${data.size}")
+//            for (a in data){
+//                a.title
+//            }
+//        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        setRecyclerView()
+    }
+
+//    override fun onPause() {
+//        super.onPause()
+//        setRecyclerView()
+//    }
+
+    override fun onResume() {
+        super.onResume()
+        setRecyclerView()
+
     }
 }

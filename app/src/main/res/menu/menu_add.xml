@@ -3,10 +3,9 @@
     xmlns:compat="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <item
-        android:id="@+id/add_memo"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="Settings"
+        android:id="@+id/save_memo"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="Save"
         compat:showAsAction="always" />
 </menu>
