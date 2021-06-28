@@ -4,8 +4,13 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
+
+
+
 
 
 class MemoAdapter internal constructor(private var rowDataList: List<MemoListActivity.RowData>) :
@@ -25,21 +30,21 @@ class MemoAdapter internal constructor(private var rowDataList: List<MemoListAct
      */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.view_holder_memo, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.view_holder_memo1, parent, false)
         return MainViewHolder(view)
     }
 
     /**
      * ViewHolderとRecyclerViewをバインドする
-     * 一行のViewに対して共通でやりたい処理をここで書く。今回はテキストのセットしかしてないけど。
+     * 一行のViewに対して共通でやりたい処理をここで書く。
      * @param holder
      * @param position
      */
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
         val rowData = rowDataList[position]
         holder.hogeTitle.text = rowData.memoTitle
-
-        holder.hogeTitle.setOnClickListener(View.OnClickListener { view ->
+//        holder.hogeTitle.setOnClickListener(View.OnClickListener { view ->
+        holder.memoLayout.setOnClickListener(View.OnClickListener { view ->
             listener?.onClick(
                 view
             )
@@ -61,4 +66,6 @@ class MemoAdapter internal constructor(private var rowDataList: List<MemoListAct
 
 class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var hogeTitle: TextView = itemView.findViewById(R.id.memo_title)
+    // 1行のレイアウトにイベントをつけるため定義
+    var memoLayout: LinearLayout = itemView.findViewById(R.id.memo_holder)
 }
