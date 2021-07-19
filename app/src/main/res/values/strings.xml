@@ -3,5 +3,8 @@
     <string name="memo_List">メモ一覧</string>
     <string name="title">Title</string>
     <string name="memo_title_text">タイトル:</string>
+    <string name="save_icon">Save</string>
+    <string name="memo_title_edit_hint">メモのタイトル</string>
+    <string name="memo_body_edit_hint">メモ:メモの内容</string>
 
 </resources>
