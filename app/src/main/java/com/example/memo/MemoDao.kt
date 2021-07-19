@@ -12,8 +12,8 @@ interface MemoDao  {
     suspend fun getAllMemo(): List<Memo>
 
     // メソッドの引数をSQLのパラメーターにマッピングするには :引数名 と書く
-    @Query("select * from Memo where id = :id")
-    suspend fun getMemo(vararg id: Int): List<Memo>
+    @Query("select * from Memo where title = :title")
+    suspend fun getMemo(vararg title: String): List<Memo>
 
     // データモデルのクラスを引数に渡すことで、データの作成ができる。
     @Insert
@@ -24,6 +24,6 @@ interface MemoDao  {
     suspend fun delete(user: Memo)
 
     // 複雑な条件で削除したい場合は、@Queryを使ってSQLを書く
-    @Query("DELETE FROM Memo WHERE id = :id")
-    suspend fun deleteId(id: Int)
+    @Query("DELETE FROM Memo WHERE title = :title")
+    suspend fun selectDelete(title: String)
 }

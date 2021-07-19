@@ -15,7 +15,6 @@ import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 
@@ -23,18 +22,27 @@ class MemoActivity : AppCompatActivity() {
 
     private val DIALOG_ID_OVERRAPPING = 0
     private val DIALOG_ID_EMPTY = 1
+    private var isNewMemo = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.memo)
 
-        this.actionBar?.title = "メモ作成"
-
+        title = "メモ作成"
 
         // Todo メモの情報を取得し反映する
-        val title = findViewById<EditText>(R.id.memo_title_edit)
+        val memoTitle = findViewById<EditText>(R.id.memo_title_edit)
+        val memoBody = findViewById<EditText>(R.id.memo_body_edit)
         val memoData = intent.getStringExtra("memo")
-        title.setText(memoData, TextView.BufferType.NORMAL);
+        if (!memoData.isNullOrEmpty()){
+            isNewMemo = false
+            memoTitle.setText(memoData.split("\n")[0], TextView.BufferType.NORMAL)
+            memoBody.setText(memoData.split("\n")[1], TextView.BufferType.NORMAL)
+            title = "メモ詳細"
+        } else {
+            isNewMemo = true
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -47,11 +55,15 @@ class MemoActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.save_memo -> {
-                saveMemoList()
+                if (isNewMemo) saveMemoList() else updateMemoList()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun updateMemoList() {
+        Toast.makeText(applicationContext, "更新処理やる", Toast.LENGTH_SHORT).show()
     }
 
     private fun saveMemoList() {
@@ -91,7 +103,7 @@ class MemoActivity : AppCompatActivity() {
             database.memoDao().insert(memo)
             Log.v("TAG", "after insert ${database.memoDao().getAllMemo()}")
             GlobalScope.launch(Dispatchers.Main) {  // main thread
-                Toast.makeText(applicationContext, "メモ保存をしました", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "メモを保存しました", Toast.LENGTH_SHORT).show()
             }
         }
     }
