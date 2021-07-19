@@ -10,7 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
-        android:text="タイトル:"
+        android:text="@string/memo_title_text"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@id/memo_title_edit"
         app:layout_constraintHorizontal_weight="2"

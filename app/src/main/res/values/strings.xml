@@ -2,5 +2,6 @@
     <string name="app_name">Memo</string>
     <string name="memo_List">メモ一覧</string>
     <string name="title">Title</string>
+    <string name="memo_title_text">タイトル:</string>
 
 </resources>
