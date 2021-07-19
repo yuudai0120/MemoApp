@@ -6,6 +6,6 @@
     <item
         android:id="@+id/delete_memo"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="Save"
+        android:title="@string/save_icon"
         compat:showAsAction="always" />
 </menu>
