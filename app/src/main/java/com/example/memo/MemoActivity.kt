@@ -23,6 +23,7 @@ class MemoActivity : AppCompatActivity() {
     private val DIALOG_ID_OVERRAPPING = 0
     private val DIALOG_ID_EMPTY = 1
     private var isNewMemo = true
+    private var updateMemo = Memo("", "", "")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +35,12 @@ class MemoActivity : AppCompatActivity() {
         val memoTitle = findViewById<EditText>(R.id.memo_title_edit)
         val memoBody = findViewById<EditText>(R.id.memo_body_edit)
         val memoData = intent.getStringExtra("memo")
-        if (!memoData.isNullOrEmpty()){
+        if (!memoData.isNullOrEmpty()) {
             isNewMemo = false
-            memoTitle.setText(memoData.split("\n")[0], TextView.BufferType.NORMAL)
-            memoBody.setText(memoData.split("\n")[1], TextView.BufferType.NORMAL)
+            updateMemo =
+                Memo(memoData.split("\n")[0], memoData.split("\n")[1], memoData.split("\n")[2])
+            memoTitle.setText(memoData.split("\n")[1], TextView.BufferType.NORMAL)
+            memoBody.setText(memoData.split("\n")[2], TextView.BufferType.NORMAL)
             title = "メモ詳細"
         } else {
             isNewMemo = true
@@ -63,7 +66,46 @@ class MemoActivity : AppCompatActivity() {
     }
 
     private fun updateMemoList() {
-        Toast.makeText(applicationContext, "更新処理やる", Toast.LENGTH_SHORT).show()
+        AlertDialog.Builder(this)
+            .setTitle("更新")
+            .setMessage("入力した内容で更新しますか？")
+            .setPositiveButton("OK") { dialog, which ->
+                val title = findViewById<EditText>(R.id.memo_title_edit)
+                val body = findViewById<EditText>(R.id.memo_body_edit)
+                //バリデーションチェックの結果
+                val check = validationCheck(title, body)
+                if (check) {
+                    updateMemoData()
+                    finish()
+                } else {
+                    createDialog(DIALOG_ID_EMPTY)
+                }
+
+
+            }
+            .setNegativeButton("キャンセル") { dialog, which -> }
+            .show()
+    }
+
+    private fun updateMemoData() {
+        val database =
+            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
+                .build()
+        val title = findViewById<EditText>(R.id.memo_title_edit)
+        val body = findViewById<EditText>(R.id.memo_body_edit)
+        updateMemo.title = title.text.toString()
+        updateMemo.body = body.text.toString()
+        Log.v("TAG", "after update ${updateMemo.titleKey + updateMemo.title + updateMemo.body}")
+
+        // データを更新
+        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
+            database.memoDao().update(updateMemo)
+
+            Log.v("TAG", "after update ${database.memoDao().getAllMemo()}")
+            GlobalScope.launch(Dispatchers.Main) {  // main thread
+                Toast.makeText(applicationContext, "メモを更新しました", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun saveMemoList() {
@@ -81,8 +123,6 @@ class MemoActivity : AppCompatActivity() {
                 } else {
                     createDialog(DIALOG_ID_EMPTY)
                 }
-
-
             }
             .setNegativeButton("キャンセル") { dialog, which -> }
             .show()
@@ -92,12 +132,12 @@ class MemoActivity : AppCompatActivity() {
         val database =
             Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
                 .build()
-        // データモデルを作成
-        val id = Random.nextInt(1000)
+        // IDを作成
+//        val id = Random.nextInt(1000)
         val title = findViewById<EditText>(R.id.memo_title_edit)
         val body = findViewById<EditText>(R.id.memo_body_edit)
 
-        val memo = Memo(id, title.text.toString(), body.text.toString())
+        val memo = Memo(title.text.toString(),title.text.toString(), body.text.toString())
         // データを保存
         GlobalScope.launch(Dispatchers.IO) { // 非同期処理
             database.memoDao().insert(memo)
@@ -110,11 +150,13 @@ class MemoActivity : AppCompatActivity() {
 
     //バリデーションチェックするためのメソッド
     private fun validationCheck(title: EditText, body: EditText): Boolean {
+        var boolean = true
         //タイトルの入力値がない場合
         if (title.text.toString().isEmpty()) {
             //画面の下にToastエラーメッセージを表示
             Toast.makeText(applicationContext, "メモのタイトルを入力してください。", Toast.LENGTH_SHORT).show()
-            return false
+//            return false
+            boolean = false
         }
 //        GlobalScope.launch(Dispatchers.IO) {
 //            val memoList = create()
@@ -126,21 +168,23 @@ class MemoActivity : AppCompatActivity() {
 //        }
 
 
-//        val database =
-//            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-//                .build()
-//        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-//            val memoList = database.memoDao().getAllMemo()
-//            for (memo in memoList) {
-//                if (memo.title == title.text.toString()) {
-//                    GlobalScope.launch(Dispatchers.Main) {  // main thread
+        val database =
+            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
+                .build()
+        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
+            val memoList = database.memoDao().getAllMemo()
+            for (memo in memoList) {
+                if (memo.title == title.text.toString() && memo.titleKey == updateMemo.titleKey) {
+                    GlobalScope.launch(Dispatchers.Main) {  // main thread
+                        // Todo ダイアログ出す
 //                        createDialog(DIALOG_ID_OVERRAPPING)
-//                    }
-//                }
-//            }
-//        }
-
-        return true
+                        Toast.makeText(applicationContext, "メモタイトルが重複しています", Toast.LENGTH_SHORT).show()
+                        boolean = false
+                    }
+                }
+            }
+        }
+        return boolean
     }
 
     /**

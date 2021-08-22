@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,7 +16,6 @@ import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.random.Random
 
 
 class MemoListActivity : AppCompatActivity() {
@@ -138,7 +136,9 @@ class MemoListActivity : AppCompatActivity() {
                     if (mainAdapter!!.getModeStatus().contains(2)) {
                         val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
                         val memoListData =
-                            memoList!![mainAdapter!!.getClickItemPositions()].title + "\n" + memoList!![mainAdapter!!.getClickItemPositions()].body
+                            memoList!![mainAdapter!!.getClickItemPositions()].titleKey + "\n" +
+                                    memoList!![mainAdapter!!.getClickItemPositions()].title + "\n" +
+                                    memoList!![mainAdapter!!.getClickItemPositions()].body
                         intent.putExtra(
                             "memo",
                             memoListData
