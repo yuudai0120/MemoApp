@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class Memo(
     @PrimaryKey
-    var id: Int,
+    var titleKey: String,
     @ColumnInfo(name = "title")
     var title: String?,
     @ColumnInfo(name = "body")
