@@ -136,7 +136,7 @@ class MemoListActivity : AppCompatActivity() {
                     if (mainAdapter!!.getModeStatus().contains(2)) {
                         val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
                         val memoListData =
-                            memoList!![mainAdapter!!.getClickItemPositions()].titleKey + "\n" +
+                            memoList!![mainAdapter!!.getClickItemPositions()].id.toString() + "\n" +
                                     memoList!![mainAdapter!!.getClickItemPositions()].title + "\n" +
                                     memoList!![mainAdapter!!.getClickItemPositions()].body
                         intent.putExtra(
