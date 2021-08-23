@@ -8,7 +8,6 @@ interface MemoDao  {
     @Query("SELECT * FROM memo")
     suspend fun getAllMemo(): List<Memo>
 
-
     // データモデルのクラスを引数に渡すことで、データの作成ができる。
     @Insert
     suspend fun insert(memo: Memo)
