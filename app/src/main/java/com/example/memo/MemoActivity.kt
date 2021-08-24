@@ -12,8 +12,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
-import kotlin.random.Random
-
 
 class MemoActivity : AppCompatActivity() {
 
@@ -77,7 +75,7 @@ class MemoActivity : AppCompatActivity() {
                     updateMemoData()
                     finish()
                 } else {
-                    MemoUtils.createDialog(applicationContext, MemoUtils.DIALOG_ID_EMPTY)
+                    MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_EMPTY)
                 }
 
 
@@ -123,7 +121,7 @@ class MemoActivity : AppCompatActivity() {
                     insertMemoData()
                     finish()
                 } else {
-                    MemoUtils.createDialog(applicationContext, MemoUtils.DIALOG_ID_EMPTY)
+                    MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_EMPTY)
                 }
             }
             .setNegativeButton("キャンセル") { dialog, which -> }
@@ -131,22 +129,15 @@ class MemoActivity : AppCompatActivity() {
     }
 
     private fun insertMemoData() {
-        val database =
-            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-                .build()
         // IDを作成
-        val id = Random.nextInt(100)
+        val id = MemoUtils.createId(applicationContext)
+//        val id = Random.nextInt(100)
         val title = findViewById<EditText>(R.id.memo_title_edit)
         val body = findViewById<EditText>(R.id.memo_body_edit)
-
-        val memo = Memo(id, title.text.toString(), body.text.toString())
-        // データを保存
-        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-            database.memoDao().insert(memo)
-            Log.v("TAG", "after insert ${database.memoDao().getAllMemo()}")
-            GlobalScope.launch(Dispatchers.Main) {  // main thread
-                Toast.makeText(applicationContext, "メモを保存しました", Toast.LENGTH_SHORT).show()
-            }
+        runBlocking() {
+            val memo = Memo(id, title.text.toString(), body.text.toString())
+            // データを保存
+            MemoUtils.memoInsert(applicationContext, memo)
         }
     }
 
@@ -157,35 +148,17 @@ class MemoActivity : AppCompatActivity() {
         if (title.text.toString().isEmpty()) {
             // 画面の下にToastエラーメッセージを表示
             Toast.makeText(applicationContext, "メモのタイトルを入力してください。", Toast.LENGTH_SHORT).show()
-//            return false
-            boolean = false
+            return false
         }
-//        GlobalScope.launch(Dispatchers.IO) {
-//            val memoList = create()
-//            for (memo in memoList) {
-//                if (memo.title == title.text.toString()) {
-//                    createDialog(DIALOG_ID_OVERRAPPING)
-//                }
-//            }
-//        }
-
-
-        val database =
-            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-                .build()
-        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-            val memoList = database.memoDao().getAllMemo()
-            for (memo in memoList) {
-                // タイトルが重複しているかどうか
-                if (memo.title == title.text.toString()) {
-                    GlobalScope.launch(Dispatchers.Main) {  // main thread
-                        // Todo ダイアログ出す(だすとクラッシュする。)
-//                        createDialog(DIALOG_ID_OVERRAPPING)
-                        Toast.makeText(applicationContext, "メモタイトルが重複しています", Toast.LENGTH_SHORT)
-                            .show()
-                        boolean = false
-                    }
-                }
+        val memoList = MemoUtils.getMemoList(applicationContext)
+        for (memo in memoList) {
+            // タイトルが重複しているかどうか
+            if (memo.title == title.text.toString()) {
+                // Todo ダイアログ出す(だすとクラッシュする。)
+                MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_OVERRAPPING)
+                Toast.makeText(applicationContext, "メモタイトルが重複しています", Toast.LENGTH_SHORT)
+                    .show()
+                boolean = false
             }
         }
         return boolean

@@ -1,6 +1,7 @@
 package com.example.memo
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Room
 import kotlinx.coroutines.*
 
@@ -16,28 +17,21 @@ class DatabaseUtils {
             return database.memoDao().getAllMemo()
         }
 
-        fun getMemoList(context: Context): Deferred<List<Memo>> = GlobalScope.async(Dispatchers.Default) {
-            getAllMemo(context)
+        // メモ情報をDBにインサートする
+        suspend fun memoInsert(context: Context, memo:Memo) {
+            val database =
+                Room.databaseBuilder(context, MemoDatabase::class.java, "database-name")
+                    .build()
+            database.memoDao().insert(memo)
+            Log.v("TAG", "after insert ${MemoUtils.getMemoList(context)}")
         }
 
-
-//
-//        fun createId(context: Context): Int {
-//            GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-//                val memoId = 0
-//                val memoIdRange: IntRange = 1..100
-//                val memoList = getMemoList(context)
-//                for (i in memoIdRange){
-//                    for(memo in memoList) {
-//                        if(memo) {
-//                            return
-//                        }
-//                    }
-//                }
-//            }
-//
-//            return 1
-//        }
-
+        // メモ情報をDBから削除する
+        suspend fun memoDelete(context: Context, memo:Memo) {
+            val database =
+                Room.databaseBuilder(context, MemoDatabase::class.java, "database-name")
+                    .build()
+            database.memoDao().delete(memo)
+        }
     }
 }
