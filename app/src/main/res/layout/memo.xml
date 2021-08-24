@@ -32,13 +32,28 @@
         android:maxLines="1"
         android:inputType="text"/>
 
+    <TextView
+        android:id="@+id/memo_body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="26dp"
+        android:text="メモ　　:"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/memo_title_edit"
+        app:layout_constraintHorizontal_weight="2"
+        app:layout_constraintTop_toBottomOf="@+id/memo_title"/>
+
     <EditText
         android:id="@+id/memo_body_edit"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:hint="@string/memo_body_edit_hint"
         android:textSize="24sp"
-        app:layout_constraintTop_toBottomOf="@+id/memo_title" />
+        app:layout_constraintTop_toBottomOf="@+id/memo_title_edit"
+        app:layout_constraintStart_toEndOf="@id/memo_body"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
