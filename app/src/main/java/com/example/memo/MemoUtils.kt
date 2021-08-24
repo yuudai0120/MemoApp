@@ -8,7 +8,7 @@ import kotlinx.coroutines.*
 
 class MemoUtils {
     companion object {
-        const val DIALOG_ID_OVERRAPPING = 0
+        const val DIALOG_ID_ALREADY = 0
         const val DIALOG_ID_EMPTY = 1
 
         /**
@@ -16,14 +16,12 @@ class MemoUtils {
          * @param id
          * @return
          */
-        fun createDialog(context: Context, id: Int): Dialog? {
-            if (id == DIALOG_ID_OVERRAPPING) {
+        fun createDialog(context: Context, id: Int) {
+            if (id == DIALOG_ID_ALREADY) {
                 AlertDialog.Builder(context)
-                    .setTitle("不正な入力です。")
-                    .setMessage("再度正しく入力してください。")
+                    .setTitle("確認。")
+                    .setMessage("同じタイトルのメモが存在しています。\n他のタイトルで作成してください。")
                     .setPositiveButton("OK") { dialog, which ->
-                        Toast.makeText(context, "同じタイトルのメモが存在しています。", Toast.LENGTH_SHORT)
-                            .show()
                     }
                     .show()
             }
@@ -35,7 +33,6 @@ class MemoUtils {
                     }
                     .show()
             }
-            return null
         }
 
 //        fun getMemoList(context: Context): Deferred<List<Memo>> =
