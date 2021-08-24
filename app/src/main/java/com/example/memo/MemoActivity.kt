@@ -74,11 +74,7 @@ class MemoActivity : AppCompatActivity() {
                 if (check) {
                     updateMemoData()
                     finish()
-                } else {
-                    MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_EMPTY)
                 }
-
-
             }
             .setNegativeButton("キャンセル") { dialog, which -> }
             .show()
@@ -120,8 +116,6 @@ class MemoActivity : AppCompatActivity() {
                 if (check) {
                     insertMemoData()
                     finish()
-                } else {
-                    MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_EMPTY)
                 }
             }
             .setNegativeButton("キャンセル") { dialog, which -> }
@@ -131,14 +125,11 @@ class MemoActivity : AppCompatActivity() {
     private fun insertMemoData() {
         // IDを作成
         val id = MemoUtils.createId(applicationContext)
-//        val id = Random.nextInt(100)
         val title = findViewById<EditText>(R.id.memo_title_edit)
         val body = findViewById<EditText>(R.id.memo_body_edit)
-        runBlocking() {
-            val memo = Memo(id, title.text.toString(), body.text.toString())
-            // データを保存
-            MemoUtils.memoInsert(applicationContext, memo)
-        }
+        val memo = Memo(id, title.text.toString(), body.text.toString())
+        // データを保存
+        MemoUtils.memoInsert(applicationContext, memo)
     }
 
     //バリデーションチェックするためのメソッド
@@ -155,9 +146,7 @@ class MemoActivity : AppCompatActivity() {
             // タイトルが重複しているかどうか
             if (memo.title == title.text.toString()) {
                 // Todo ダイアログ出す(だすとクラッシュする。)
-                MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_OVERRAPPING)
-                Toast.makeText(applicationContext, "メモタイトルが重複しています", Toast.LENGTH_SHORT)
-                    .show()
+                MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_ALREADY)
                 boolean = false
             }
         }
