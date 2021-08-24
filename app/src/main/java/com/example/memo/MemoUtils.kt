@@ -10,6 +10,10 @@ class MemoUtils {
     companion object {
         const val DIALOG_ID_ALREADY = 0
         const val DIALOG_ID_EMPTY = 1
+        const val DIALOG_ID_LIMIT = 2
+
+        /** メモの上限数 */
+        const val MEMO_LIMIT = 5
 
         /**
          * ダイアログ生成
@@ -29,6 +33,14 @@ class MemoUtils {
                 AlertDialog.Builder(context)
                     .setTitle("不正な入力です。")
                     .setMessage("再度正しく入力してください。")
+                    .setPositiveButton("OK") { dialog, which ->
+                    }
+                    .show()
+            }
+            if (id == DIALOG_ID_LIMIT) {
+                AlertDialog.Builder(context)
+                    .setTitle("確認")
+                    .setMessage("メモの上限を超えました。\nメモを削除してから作成してください。")
                     .setPositiveButton("OK") { dialog, which ->
                     }
                     .show()
@@ -96,6 +108,14 @@ class MemoUtils {
                 }
                 memoId
             }
+        }
+
+        fun checkMemo(context: Context): Boolean {
+            val memoList = getMemoList(context)
+            if (memoList.size < MEMO_LIMIT ) {
+                return true
+            }
+            return false
         }
     }
 
