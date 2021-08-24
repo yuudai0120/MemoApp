@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -28,18 +29,11 @@ class MemoListActivity : AppCompatActivity() {
      */
     var mMenuType = 1
 
-    /* 通常時に表示するメニューを表す */
-    private val MENU_STANDARD_MODE = 1
-
-    /* 選択モード時に表示するメニューを表す */
-    private val MENU_SELECT_MODE = 2
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.memo_list)
         title = "メモ一覧"
         setRecyclerView()
-        getMemoData()
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -106,14 +100,20 @@ class MemoListActivity : AppCompatActivity() {
         // Adapter生成してRecyclerViewにセット
 //        mainAdapter = MemoAdapter(createRowData(page))
 
-        val database =
-            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-                .build()
-
         // データを保存
         GlobalScope.launch(Dispatchers.IO) { // 非同期処理
             val dataSet: MutableList<RowData> = ArrayList()
-            memoList = database.memoDao().getAllMemo()
+            memoList = MemoUtils.getMemoList(applicationContext)
+            GlobalScope.launch(Dispatchers.Main) {
+                if (memoList!!.isEmpty()) {
+                    val nonMemoText = findViewById<TextView>(R.id.non_memo)
+                    nonMemoText.visibility = View.VISIBLE
+                } else {
+                    val nonMemoText = findViewById<TextView>(R.id.non_memo)
+                    nonMemoText.visibility = View.GONE
+                }
+            }
+
             for (memo in memoList!!) {
                 val data = RowData()
                 data.memoTitle = memo.title
@@ -126,10 +126,10 @@ class MemoListActivity : AppCompatActivity() {
                 mainAdapter!!.setOnItemClickListener(View.OnClickListener {
 
                     if (mainAdapter!!.getSelectedItemPositions().isNotEmpty()) {
-                        mMenuType = 2
+                        mMenuType = MENU_SELECT_MODE
                         invalidateOptionsMenu()
                     } else {
-                        mMenuType = 1
+                        mMenuType = MENU_STANDARD_MODE
                         invalidateOptionsMenu()
                     }
 
@@ -157,33 +157,15 @@ class MemoListActivity : AppCompatActivity() {
         var memoTitle: String? = null
     }
 
-    private fun getMemoData() {
-//        val database =
-//            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-//                .build()
-//        // データを保存
-//        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-//            val data = database.memoDao().getAllMemo()
-//            Log.v("TAG", "after insert ${database.memoDao().getAllMemo()}")
-//            GlobalScope.launch(Dispatchers.Main) {  // main thread
-//                Toast.makeText(applicationContext, "メモ取得しました", Toast.LENGTH_SHORT).show()
-//            }
-//            Log.v("TAG", "data: ${data.size}")
-//            for (a in data){
-//                a.title
-//            }
-//        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         setRecyclerView()
     }
 
-//    override fun onPause() {
-//        super.onPause()
-//        setRecyclerView()
-//    }
+    override fun onPause() {
+        super.onPause()
+        setRecyclerView()
+    }
 
     override fun onResume() {
         super.onResume()
@@ -205,9 +187,6 @@ class MemoListActivity : AppCompatActivity() {
     }
 
     private fun deleteMemoData() {
-        val database =
-            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-                .build()
         // 削除するデータリストを作成
         val deleteMemoList: MutableList<Memo> = ArrayList()
         // 削除するpositionのリストを作成
@@ -217,22 +196,20 @@ class MemoListActivity : AppCompatActivity() {
         }
         // データを保存
         GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-//            for (x in a){
-//                database.memoDao().selectDelete(memoList?.get(x).toString())
-//            }
-//            for (memo in memoList!!){
-//                database.memoDao().delete(memo)
-//            }
             for (deletMemo in deleteMemoList) {
-                database.memoDao().delete(deletMemo)
+                MemoUtils.memoDelete(applicationContext, deletMemo)
             }
-
-            Log.v("TAG", "after delete ${database.memoDao().getAllMemo()}")
             GlobalScope.launch(Dispatchers.Main) {  // main thread
-                Toast.makeText(applicationContext, "メモを削除しました", Toast.LENGTH_SHORT).show()
                 mMenuType = 1
                 invalidateOptionsMenu()
             }
         }
+    }
+
+    companion object {
+        /* 通常時に表示するメニューを表す */
+        private const val MENU_STANDARD_MODE = 1
+        /* 選択モード時に表示するメニューを表す */
+        private const val MENU_SELECT_MODE = 2
     }
 }
