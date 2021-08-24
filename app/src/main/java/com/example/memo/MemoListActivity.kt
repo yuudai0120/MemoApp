@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -82,9 +83,14 @@ class MemoListActivity : AppCompatActivity() {
     }
 
     private fun addMemo() {
-        // 起動する対象をクラスオブジェクトで指定する
-        val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
-        startActivity(intent)
+        val check = MemoUtils.checkMemo(this)
+        if (check) {
+            // 起動する対象をクラスオブジェクトで指定する
+            val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
+            startActivity(intent)
+        } else {
+            MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_LIMIT)
+        }
     }
 
     fun setRecyclerView() {
