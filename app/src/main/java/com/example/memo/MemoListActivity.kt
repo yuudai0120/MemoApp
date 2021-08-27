@@ -3,27 +3,21 @@ package com.example.memo
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 
 class MemoListActivity : AppCompatActivity() {
 
     var mainAdapter: MemoAdapter? = null
-    private var memoList: List<Memo>? = null
+    private var memoList: List<Memo> = ArrayList()
 
     /**
      * メニューレイアウト管理用変数
@@ -68,7 +62,7 @@ class MemoListActivity : AppCompatActivity() {
                 val a = mainAdapter!!.getSelectedItemPositions()
                 val memoTitleList: MutableList<String> = ArrayList()
                 for (x in a) {
-                    memoTitleList.add(memoList?.get(x).toString())
+                    memoTitleList.add(memoList[x].toString())
                 }
                 Toast.makeText(
                     applicationContext,
@@ -107,53 +101,47 @@ class MemoListActivity : AppCompatActivity() {
 //        mainAdapter = MemoAdapter(createRowData(page))
 
         // データを保存
-        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-            val dataSet: MutableList<RowData> = ArrayList()
-            memoList = MemoUtils.getMemoList(applicationContext)
-            GlobalScope.launch(Dispatchers.Main) {
-                if (memoList!!.isEmpty()) {
-                    val nonMemoText = findViewById<TextView>(R.id.non_memo)
-                    nonMemoText.visibility = View.VISIBLE
-                } else {
-                    val nonMemoText = findViewById<TextView>(R.id.non_memo)
-                    nonMemoText.visibility = View.GONE
-                }
-            }
-
-            for (memo in memoList!!) {
-                val data = RowData()
-                data.memoTitle = memo.title
-                dataSet.add(data)
-            }
-
-            GlobalScope.launch(Dispatchers.Main) {  // main thread
-                mainAdapter = MemoAdapter(applicationContext, dataSet, false)
-                recyclerView.adapter = mainAdapter
-                mainAdapter!!.setOnItemClickListener(View.OnClickListener {
-
-                    if (mainAdapter!!.getSelectedItemPositions().isNotEmpty()) {
-                        mMenuType = MENU_SELECT_MODE
-                        invalidateOptionsMenu()
-                    } else {
-                        mMenuType = MENU_STANDARD_MODE
-                        invalidateOptionsMenu()
-                    }
-
-                    if (mainAdapter!!.getModeStatus().contains(2)) {
-                        val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
-                        val memoListData =
-                            memoList!![mainAdapter!!.getClickItemPositions()].id.toString() + "\n" +
-                                    memoList!![mainAdapter!!.getClickItemPositions()].title + "\n" +
-                                    memoList!![mainAdapter!!.getClickItemPositions()].body
-                        intent.putExtra(
-                            "memo",
-                            memoListData
-                        )
-                        startActivity(intent)
-                    }
-                })
-            }
+        val dataSet: MutableList<RowData> = ArrayList()
+        memoList = MemoUtils.getMemoList(applicationContext)
+        if (memoList.isEmpty()) {
+            val nonMemoText = findViewById<TextView>(R.id.non_memo)
+            nonMemoText.visibility = View.VISIBLE
+        } else {
+            val nonMemoText = findViewById<TextView>(R.id.non_memo)
+            nonMemoText.visibility = View.GONE
         }
+
+        for (memo in memoList) {
+            val data = RowData()
+            data.memoTitle = memo.title
+            dataSet.add(data)
+        }
+
+        mainAdapter = MemoAdapter(applicationContext, dataSet, false)
+        recyclerView.adapter = mainAdapter
+        mainAdapter!!.setOnItemClickListener(View.OnClickListener {
+
+            if (mainAdapter!!.getSelectedItemPositions().isNotEmpty()) {
+                mMenuType = MENU_SELECT_MODE
+                invalidateOptionsMenu()
+            } else {
+                mMenuType = MENU_STANDARD_MODE
+                invalidateOptionsMenu()
+            }
+
+            if (mainAdapter!!.getModeStatus().contains(2)) {
+                val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
+                val memoListData =
+                    memoList[mainAdapter!!.getClickItemPositions()].id.toString() + "\n" +
+                            memoList[mainAdapter!!.getClickItemPositions()].title + "\n" +
+                            memoList[mainAdapter!!.getClickItemPositions()].body
+                intent.putExtra(
+                    "memo",
+                    memoListData
+                )
+                startActivity(intent)
+            }
+        })
     }
 
     /**
@@ -198,18 +186,14 @@ class MemoListActivity : AppCompatActivity() {
         // 削除するpositionのリストを作成
         val deletePosition = mainAdapter!!.getSelectedItemPositions()
         for (position in deletePosition) {
-            memoList?.get(position)?.let { deleteMemoList.add(it) }
+            memoList[position].let { deleteMemoList.add(it) }
         }
         // データを保存
-        GlobalScope.launch(Dispatchers.IO) { // 非同期処理
-            for (deletMemo in deleteMemoList) {
-                MemoUtils.memoDelete(applicationContext, deletMemo)
-            }
-            GlobalScope.launch(Dispatchers.Main) {  // main thread
-                mMenuType = 1
-                invalidateOptionsMenu()
-            }
+        for (deleteMemo in deleteMemoList) {
+            MemoUtils.memoDelete(this, deleteMemo)
         }
+        mMenuType = 1
+        invalidateOptionsMenu()
     }
 
     companion object {
