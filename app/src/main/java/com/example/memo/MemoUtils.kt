@@ -1,7 +1,6 @@
 package com.example.memo
 
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.Context
 import android.widget.Toast
 import kotlinx.coroutines.*
@@ -60,16 +59,12 @@ class MemoUtils {
 
         fun memoInsert(context: Context, memo: Memo) = runBlocking() {
             DatabaseUtils.memoInsert(context, memo)
-            GlobalScope.launch(Dispatchers.Main) {  // main thread
-                Toast.makeText(context, "メモを保存しました", Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(context, "メモを保存しました", Toast.LENGTH_SHORT).show()
         }
 
         fun memoDelete(context: Context, deleteMemo: Memo) = runBlocking() {
             DatabaseUtils.memoDelete(context, deleteMemo)
-            GlobalScope.launch(Dispatchers.Main) {  // main thread
                 Toast.makeText(context, "メモを削除しました", Toast.LENGTH_SHORT).show()
-            }
         }
 
 
