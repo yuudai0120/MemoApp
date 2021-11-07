@@ -23,7 +23,6 @@ class DatabaseUtils {
                 Room.databaseBuilder(context, MemoDatabase::class.java, "database-name")
                     .build()
             database.memoDao().insert(memo)
-            Log.v("TAG", "after insert ${MemoUtils.getMemoList(context)}")
         }
 
         // メモ情報をDBから削除する
