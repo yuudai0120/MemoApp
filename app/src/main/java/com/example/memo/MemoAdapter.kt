@@ -5,7 +5,6 @@ import android.view.*
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -49,23 +48,9 @@ class MemoAdapter internal constructor(
     override fun onBindViewHolder(holder: MainViewHolder, position: Int) {
 
         val rowData = itemDataList[position]
-        holder.hogeTitle.text = rowData.memoTitle
+        holder.memoTitle.text = rowData.memoTitle
         //このアイテムが選択済みの場合はチェックを入れる（✓のイメージを表示する）
         holder.checkBox.visibility = if (isSelectedItem(position)) View.VISIBLE else View.GONE
-//        holder.hogeTitle.setOnClickListener(View.OnClickListener { view ->
-
-//        holder.memoLayout.setOnClickListener(View.OnClickListener { view ->
-//            listener?.onClick(
-//                //選択モードでないときは普通のクリックとして扱う
-//                if (!isSelectableMode && !isAlwaysSelectable) Toast.makeText(context, "Normal click", Toast.LENGTH_SHORT).show()
-//                else {
-//                    if (isSelectedItem(position)) removeSelectedItem(position)
-//                    else addSelectedItem(position)
-//
-//                    onBindViewHolder(holder, position)
-//                }
-//            )
-//        })
 
         holder.memoLayout.setOnClickListener {
             //選択モードでないときは普通のクリックとして扱う
@@ -136,7 +121,6 @@ class MemoAdapter internal constructor(
     private fun addSelectedItem(position: Int) {
         if (selectedItemPositions.isEmpty() && !isAlwaysSelectable) {
             isSelectableMode = true
-            Toast.makeText(context, "Selectable Mode ON", Toast.LENGTH_SHORT).show()
             modeStatus.add(1)
         }
         selectedItemPositions.add(position)
@@ -147,14 +131,13 @@ class MemoAdapter internal constructor(
         selectedItemPositions.remove(position)
         if (selectedItemPositions.isEmpty() && !isAlwaysSelectable) {
             isSelectableMode = false
-            Toast.makeText(context, "Selectable Mode OFF", Toast.LENGTH_SHORT).show()
             modeStatus.clear()
         }
     }
 }
 
 class MainViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    var hogeTitle: TextView = itemView.findViewById(R.id.memo_title)
+    var memoTitle: TextView = itemView.findViewById(R.id.memo_title)
 
     // 1行のレイアウトにイベントをつけるため定義
     var memoLayout: LinearLayout = itemView.findViewById(R.id.memo_holder)

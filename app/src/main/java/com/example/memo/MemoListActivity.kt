@@ -27,21 +27,9 @@ class MemoListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.memo_list)
-        title = "メモ一覧"
+        title = getString(R.string.memo_list)
         setRecyclerView()
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-////        val inflater: MenuInflater = menuInflater
-////        inflater.inflate(R.menu.menu, menu)
-////        return true
-//        // メニューレイアウト管理用変数が切り替わる度にメニューのレイアウトを切り替える
-//        when (mMenuType) {
-//            MENU_STANDARD_MODE -> menuInflater.inflate(R.menu.menu, menu)
-//            MENU_SELECT_MODE -> menuInflater.inflate(R.menu.menu_select_mode, menu)
-//        }
-//        return super.onCreateOptionsMenu(menu)
-//    }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         when (mMenuType) {
@@ -170,13 +158,13 @@ class MemoListActivity : AppCompatActivity() {
 
     private fun deleteMemoList() {
         AlertDialog.Builder(this)
-            .setTitle("削除")
-            .setMessage("選択したメモを削除しますか？ " + "\n" + "※この操作は取り消せません。")
-            .setPositiveButton("OK") { dialog, which ->
+            .setTitle(getString(R.string.delete))
+            .setMessage(getString(R.string.delete_confirmation))
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 deleteMemoData()
                 setRecyclerView()
             }
-            .setNegativeButton("キャンセル") { dialog, which -> }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, which -> }
             .show()
     }
 

@@ -22,9 +22,8 @@ class MemoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.memo)
 
-        title = "メモ作成"
+        title = getString(R.string.memo_create)
 
-        // Todo メモの情報を取得し反映する
         val memoTitle = findViewById<EditText>(R.id.memo_title_edit)
         val memoBody = findViewById<EditText>(R.id.memo_body_edit)
         val memoData = intent.getStringExtra("memo")
@@ -38,7 +37,7 @@ class MemoActivity : AppCompatActivity() {
                 )
             memoTitle.setText(memoData.split("\n")[1], TextView.BufferType.NORMAL)
             memoBody.setText(memoData.split("\n")[2], TextView.BufferType.NORMAL)
-            title = "メモ詳細"
+            title = getString(R.string.memo_detail)
         } else {
             isNewMemo = true
         }
@@ -64,19 +63,18 @@ class MemoActivity : AppCompatActivity() {
 
     private fun updateMemoList() {
         AlertDialog.Builder(this)
-            .setTitle("更新")
-            .setMessage("入力した内容で更新しますか？")
-            .setPositiveButton("OK") { dialog, which ->
+            .setTitle(getString(R.string.update))
+            .setMessage(getString(R.string.update_confirmation))
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 val title = findViewById<EditText>(R.id.memo_title_edit)
-                val body = findViewById<EditText>(R.id.memo_body_edit)
                 //バリデーションチェックの結果
-                val check = validationCheck(title, body)
+                val check = validationCheck(title)
                 if (check) {
                     updateMemoData()
                     finish()
                 }
             }
-            .setNegativeButton("キャンセル") { dialog, which -> }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, which -> }
             .show()
     }
 
@@ -88,37 +86,31 @@ class MemoActivity : AppCompatActivity() {
         val body = findViewById<EditText>(R.id.memo_body_edit)
         updateMemo.title = title.text.toString()
         updateMemo.body = body.text.toString()
-        Log.v(
-            "TAG",
-            "after update ${updateMemo.id.toString() + updateMemo.title + updateMemo.body}"
-        )
 
         // データを更新
         GlobalScope.launch(Dispatchers.IO) { // 非同期処理
             database.memoDao().update(updateMemo)
 
-            Log.v("TAG", "after update ${database.memoDao().getAllMemo()}")
             GlobalScope.launch(Dispatchers.Main) {  // main thread
-                Toast.makeText(applicationContext, "メモを更新しました", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, getString(R.string.update_message), Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun saveMemoList() {
         AlertDialog.Builder(this)
-            .setTitle("保存")
-            .setMessage("入力した内容で保存しますか？")
-            .setPositiveButton("OK") { dialog, which ->
+            .setTitle(getString(R.string.save))
+            .setMessage(getString(R.string.save_confirmation))
+            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 val title = findViewById<EditText>(R.id.memo_title_edit)
-                val body = findViewById<EditText>(R.id.memo_body_edit)
                 //バリデーションチェックの結果
-                val check = validationCheck(title, body)
+                val check = validationCheck(title)
                 if (check) {
                     insertMemoData()
                     finish()
                 }
             }
-            .setNegativeButton("キャンセル") { dialog, which -> }
+            .setNegativeButton(getString(R.string.cancel)) { dialog, which -> }
             .show()
     }
 
@@ -133,39 +125,23 @@ class MemoActivity : AppCompatActivity() {
     }
 
     //バリデーションチェックするためのメソッド
-    private fun validationCheck(title: EditText, body: EditText): Boolean {
+    private fun validationCheck(title: EditText): Boolean {
         var boolean = true
         // タイトルの入力値がない場合
         if (title.text.toString().isEmpty()) {
             // 画面の下にToastエラーメッセージを表示
-            Toast.makeText(applicationContext, "メモのタイトルを入力してください。", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.non_memo_title_message), Toast.LENGTH_SHORT).show()
             return false
         }
         val memoList = MemoUtils.getMemoList(applicationContext)
         for (memo in memoList) {
             // タイトルが重複しているかどうか
             if (memo.title == title.text.toString()) {
-                // Todo ダイアログ出す(だすとクラッシュする。)
                 MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_ALREADY)
                 boolean = false
             }
         }
         return boolean
     }
-
-
-
-
-//    suspend fun create(): List<Memo> {
-//        return withContext(Dispatchers.IO) {
-//            val database =
-//                Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
-//                    .build()
-//            val dao = database.memoDao()
-//            dao.getAllMemo()
-//        }
-//    }
-
-
 }
 
