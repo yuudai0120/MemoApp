@@ -27,7 +27,10 @@ class MemoActivity : AppCompatActivity() {
         val memoTitle = findViewById<EditText>(R.id.memo_title_edit)
         val memoBody = findViewById<EditText>(R.id.memo_body_edit)
         val memoData = intent.getStringExtra("memo")
-        if (!memoData.isNullOrEmpty()) {
+        if (memoData.isNullOrEmpty()) {
+            isNewMemo = true
+            return
+        } else {
             isNewMemo = false
             updateMemo =
                 Memo(
@@ -38,10 +41,7 @@ class MemoActivity : AppCompatActivity() {
             memoTitle.setText(memoData.split("\n")[1], TextView.BufferType.NORMAL)
             memoBody.setText(memoData.split("\n")[2], TextView.BufferType.NORMAL)
             title = getString(R.string.memo_detail)
-        } else {
-            isNewMemo = true
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
