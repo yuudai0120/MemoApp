@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MemoActivity">
+        <activity android:name=".MemoCeateOrDetailActivity">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

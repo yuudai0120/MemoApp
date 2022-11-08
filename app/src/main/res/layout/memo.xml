@@ -42,7 +42,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/memo_title_edit"
         app:layout_constraintHorizontal_weight="2"
-        app:layout_constraintTop_toBottomOf="@+id/memo_title"/>
+        app:layout_constraintTop_toBottomOf="@+id/memo_title"
+        android:maxLength="140"
+        />
 
     <EditText
         android:id="@+id/memo_body_edit"

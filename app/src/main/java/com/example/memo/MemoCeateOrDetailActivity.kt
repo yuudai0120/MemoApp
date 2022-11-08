@@ -2,7 +2,6 @@ package com.example.memo
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -13,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
 
-class MemoActivity : AppCompatActivity() {
+class MemoCeateOrDetailActivity : AppCompatActivity() {
 
     private var isNewMemo = true
     private var updateMemo = Memo(0, "", "")
@@ -68,8 +67,7 @@ class MemoActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 val title = findViewById<EditText>(R.id.memo_title_edit)
                 //バリデーションチェックの結果
-                val check = validationCheck(title)
-                if (check) {
+                if (validationCheck(title)) {
                     updateMemoData()
                     finish()
                 }
@@ -80,7 +78,7 @@ class MemoActivity : AppCompatActivity() {
 
     private fun updateMemoData() {
         val database =
-            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, "database-name")
+            Room.databaseBuilder(applicationContext, MemoDatabase::class.java, DatabaseUtils.dataBaseName)
                 .build()
         val title = findViewById<EditText>(R.id.memo_title_edit)
         val body = findViewById<EditText>(R.id.memo_body_edit)
@@ -104,8 +102,7 @@ class MemoActivity : AppCompatActivity() {
             .setPositiveButton(getString(R.string.ok)) { dialog, which ->
                 val title = findViewById<EditText>(R.id.memo_title_edit)
                 //バリデーションチェックの結果
-                val check = validationCheck(title)
-                if (check) {
+                if (validationCheck(title)) {
                     insertMemoData()
                     finish()
                 }
@@ -126,7 +123,7 @@ class MemoActivity : AppCompatActivity() {
 
     //バリデーションチェックするためのメソッド
     private fun validationCheck(title: EditText): Boolean {
-        var boolean = true
+        var validationStatus = true
         // タイトルの入力値がない場合
         if (title.text.toString().isEmpty()) {
             // 画面の下にToastエラーメッセージを表示
@@ -138,10 +135,10 @@ class MemoActivity : AppCompatActivity() {
             // タイトルが重複しているかどうか
             if (memo.title == title.text.toString()) {
                 MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_ALREADY)
-                boolean = false
+                validationStatus = false
             }
         }
-        return boolean
+        return validationStatus
     }
 }
 

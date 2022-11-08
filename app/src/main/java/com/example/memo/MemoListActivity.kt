@@ -47,10 +47,12 @@ class MemoListActivity : AppCompatActivity() {
                 true
             }
             R.id.delete_memo -> {
-                val a = mainAdapter!!.getSelectedItemPositions()
+                val selectedItemPositions = mainAdapter?.getSelectedItemPositions()
                 val memoTitleList: MutableList<String> = ArrayList()
-                for (x in a) {
-                    memoTitleList.add(memoList[x].toString())
+                if (selectedItemPositions != null) {
+                    for (x in selectedItemPositions) {
+                        memoTitleList.add(memoList[x].toString())
+                    }
                 }
                 Toast.makeText(
                     applicationContext,
@@ -65,11 +67,9 @@ class MemoListActivity : AppCompatActivity() {
     }
 
     private fun addMemo() {
-        val check = MemoUtils.checkMemo(this)
-        if (check) {
+        if (MemoUtils.checkMemoListLimit(this)) {
             // 起動する対象をクラスオブジェクトで指定する
-            val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this@MemoListActivity, MemoCeateOrDetailActivity::class.java))
         } else {
             MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_LIMIT)
         }
@@ -118,7 +118,7 @@ class MemoListActivity : AppCompatActivity() {
             }
 
             if (mainAdapter!!.getModeStatus().contains(2)) {
-                val intent = Intent(this@MemoListActivity, MemoActivity::class.java)
+                val intent = Intent(this@MemoListActivity, MemoCeateOrDetailActivity::class.java)
                 val memoListData =
                     memoList[mainAdapter!!.getClickItemPositions()].id.toString() + "\n" +
                             memoList[mainAdapter!!.getClickItemPositions()].title + "\n" +
@@ -172,9 +172,12 @@ class MemoListActivity : AppCompatActivity() {
         // 削除するデータリストを作成
         val deleteMemoList: MutableList<Memo> = ArrayList()
         // 削除するpositionのリストを作成
-        val deletePosition = mainAdapter!!.getSelectedItemPositions()
-        for (position in deletePosition) {
-            memoList[position].let { deleteMemoList.add(it) }
+        val deletePosition = mainAdapter?.getSelectedItemPositions()
+
+        if (deletePosition != null) {
+            for (position in deletePosition) {
+                memoList[position].let { deleteMemoList.add(it) }
+            }
         }
         // データを保存
         for (deleteMemo in deleteMemoList) {

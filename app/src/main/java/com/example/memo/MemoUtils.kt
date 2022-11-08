@@ -20,8 +20,9 @@ class MemoUtils {
          * @return
          */
         fun createDialog(context: Context, id: Int) {
+            val alertDialogBuilder = AlertDialog.Builder(context)
             if (id == DIALOG_ID_ALREADY) {
-                AlertDialog.Builder(context)
+                alertDialogBuilder
                     .setTitle(context.getString(R.string.confirmation))
                     .setMessage(context.getString(R.string.memo_title_duplicate_message))
                     .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
@@ -29,7 +30,7 @@ class MemoUtils {
                     .show()
             }
             if (id == DIALOG_ID_EMPTY) {
-                AlertDialog.Builder(context)
+                alertDialogBuilder
                     .setTitle(context.getString(R.string.illegal_message_title))
                     .setMessage(context.getString(R.string.illegal_message))
                     .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
@@ -37,7 +38,7 @@ class MemoUtils {
                     .show()
             }
             if (id == DIALOG_ID_LIMIT) {
-                AlertDialog.Builder(context)
+                alertDialogBuilder
                     .setTitle(context.getString(R.string.confirmation))
                     .setMessage(context.getString(R.string.limit_message))
                     .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
@@ -81,9 +82,8 @@ class MemoUtils {
             }
         }
 
-        fun checkMemo(context: Context): Boolean {
-            val memoList = getMemoList(context)
-            if (memoList.size < MEMO_LIMIT ) {
+        fun checkMemoListLimit(context: Context): Boolean {
+            if (getMemoList(context).size < MEMO_LIMIT ) {
                 return true
             }
             return false
