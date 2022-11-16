@@ -20,31 +20,29 @@ class MemoUtils {
          * @return
          */
         fun createDialog(context: Context, id: Int) {
-            val alertDialogBuilder = AlertDialog.Builder(context)
-            if (id == DIALOG_ID_ALREADY) {
-                alertDialogBuilder
-                    .setTitle(context.getString(R.string.confirmation))
-                    .setMessage(context.getString(R.string.memo_title_duplicate_message))
-                    .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
-                    }
-                    .show()
+            var title= ""
+            var message = ""
+
+            when (id) {
+                DIALOG_ID_ALREADY -> {
+                    title = context.getString(R.string.confirmation)
+                    message = context.getString(R.string.memo_title_duplicate_message)
+                }
+                DIALOG_ID_EMPTY -> {
+                    title = context.getString(R.string.illegal_message_title)
+                    message = context.getString(R.string.illegal_message)
+                }
+                DIALOG_ID_LIMIT -> {
+                    title = context.getString(R.string.confirmation)
+                    message = context.getString(R.string.limit_message)
+                }
             }
-            if (id == DIALOG_ID_EMPTY) {
-                alertDialogBuilder
-                    .setTitle(context.getString(R.string.illegal_message_title))
-                    .setMessage(context.getString(R.string.illegal_message))
-                    .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
-                    }
-                    .show()
-            }
-            if (id == DIALOG_ID_LIMIT) {
-                alertDialogBuilder
-                    .setTitle(context.getString(R.string.confirmation))
-                    .setMessage(context.getString(R.string.limit_message))
-                    .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
-                    }
-                    .show()
-            }
+            AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(context.getString(R.string.ok)) { dialog, which ->
+                }
+                .show()
         }
 
         fun getMemoList(context: Context): List<Memo> {
