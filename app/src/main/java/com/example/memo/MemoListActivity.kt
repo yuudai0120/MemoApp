@@ -69,7 +69,7 @@ class MemoListActivity : AppCompatActivity() {
     private fun addMemo() {
         if (MemoUtils.checkMemoListLimit(this)) {
             // 起動する対象をクラスオブジェクトで指定する
-            startActivity(Intent(this@MemoListActivity, MemoCeateAndDetailActivity::class.java))
+            startActivity(Intent(this@MemoListActivity, MemoCreateAndDetailActivity::class.java))
         } else {
             MemoUtils.createDialog(this, MemoUtils.DIALOG_ID_LIMIT)
         }
@@ -118,7 +118,7 @@ class MemoListActivity : AppCompatActivity() {
             }
 
             if (mainAdapter!!.getModeStatus().contains(2)) {
-                val intent = Intent(this@MemoListActivity, MemoCeateAndDetailActivity::class.java)
+                val intent = Intent(this@MemoListActivity, MemoCreateAndDetailActivity::class.java)
                 val memoListData =
                     memoList[mainAdapter!!.getClickItemPositions()].id.toString() + "\n" +
                             memoList[mainAdapter!!.getClickItemPositions()].title + "\n" +

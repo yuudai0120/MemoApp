@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import kotlinx.coroutines.*
 
-class MemoCeateAndDetailActivity : AppCompatActivity() {
+class MemoCreateAndDetailActivity : AppCompatActivity() {
 
     private var isNewMemo = true
     private var updateMemo = Memo(0, "", "")
